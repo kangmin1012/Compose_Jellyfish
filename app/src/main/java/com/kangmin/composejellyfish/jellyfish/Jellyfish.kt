@@ -14,10 +14,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kangmin.composejellyfish.background.blueRadialGradient
 import com.kangmin.composejellyfish.ui.theme.ComposeJellyfishTheme
+import com.kangmin.composejellyfish.ui.theme.Gray
+import com.kangmin.composejellyfish.ui.theme.Gray300
 import com.kangmin.composejellyfish.ui.theme.White300
 
 private val solidWhiteColor = SolidColor(Color.White)
 private val solidWhite300Color = SolidColor(White300)
+private val solidGrayColor = SolidColor(Gray)
+private val solidGray300Color = SolidColor(Gray300)
 
 @Composable
 fun Jellyfish() {
@@ -110,6 +114,56 @@ fun Jellyfish() {
                     fill = solidWhite300Color
                 )
             }
+            // 해파리 얼굴 Vector Group
+            Group(name = "face") {
+                Path(
+                    pathData = JellyFishPaths.leftEye,
+                    fill = solidGrayColor
+                )
+                Path(
+                    pathData = JellyFishPaths.rightEye,
+                    fill = solidGrayColor
+                )
+                Path(
+                    pathData = JellyFishPaths.mouth,
+                    fill = solidGray300Color
+                )
+            }
+        }
+
+        // 해파리 주변 거품 VectorDrawable
+        Group(
+            name = "bubble"
+        ) {
+            Path(
+                pathData = JellyFishPaths.bubble1,
+                fill = solidWhiteColor,
+                fillAlpha = 0.67f
+            )
+
+            Path(
+                pathData = JellyFishPaths.bubble2,
+                fill = solidWhiteColor,
+                fillAlpha = 0.75f
+            )
+
+            Path(
+                pathData = JellyFishPaths.bubble3,
+                fill = solidWhiteColor,
+                fillAlpha = 0.89f
+            )
+
+            Path(
+                pathData = JellyFishPaths.bubble4,
+                fill = solidWhiteColor,
+                fillAlpha = 0.77f
+            )
+
+            Path(
+                pathData = JellyFishPaths.bubble5,
+                fill = solidWhiteColor,
+                fillAlpha = 0.77f
+            )
         }
     }
 
