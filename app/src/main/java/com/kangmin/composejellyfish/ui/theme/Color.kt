@@ -9,3 +9,4 @@ val Teal200 = Color(0xFF03DAC5)
 
 val Sky = Color(0xFF2be4dc)
 val DeepBlue = Color(0xFF243484)
+val White300 = Color(0xfff0dfe2)
