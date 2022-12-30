@@ -1,24 +1,29 @@
 package com.kangmin.composejellyfish.jellyfish
 
+import android.graphics.RuntimeShader
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.Group
 import androidx.compose.ui.graphics.vector.Path
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kangmin.composejellyfish.background.blueRadialGradient
+import com.kangmin.composejellyfish.effect.WOBBLE_SHADER
 import com.kangmin.composejellyfish.ui.theme.ComposeJellyfishTheme
 import com.kangmin.composejellyfish.ui.theme.Gray
 import com.kangmin.composejellyfish.ui.theme.Gray300
@@ -40,6 +45,25 @@ fun Jellyfish() {
     val blinkScaleAnimation = remember {
         Animatable(1f)
     }
+
+
+    /* Copyright 2022 Google LLC.
+    SPDX-License-Identifier: Apache-2.0 */
+    val time by produceState(0f) {
+        while (true) {
+            withInfiniteAnimationFrameMillis {
+                value = it / 1000f
+            }
+        }
+    }
+
+    // 해당 쉐이더는 sdk 33 이상부터 가능합니다
+    val shader = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        RuntimeShader(WOBBLE_SHADER)
+    } else {
+        null
+    }
+
 
     suspend fun startBlinkAnimation() {
         val tweenSpec = tween<Float>(durationMillis = 150, easing = LinearEasing)
@@ -231,13 +255,36 @@ fun Jellyfish() {
                 }
             }
             .background(blueRadialGradient)
+            .onSizeChanged { size ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    shader?.setFloatUniform(
+                        "resolution",
+                        size.width.toFloat(),
+                        size.height.toFloat()
+                    )
+                }
+            }
+            .graphicsLayer {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    shader?.let {
+                        it.setFloatUniform("time", time)
+                        renderEffect = android.graphics.RenderEffect
+                            .createRuntimeShaderEffect(
+                                it,
+                                "contents"
+                            )
+                            .asComposeRenderEffect()
+                    }
+                }
+            }
     )
 }
 
-@Preview(showSystemUi = true)
+
+@Preview(showSystemUi = true, device = Devices.PIXEL, apiLevel = Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun PreviewJellyfish() {
     ComposeJellyfishTheme {
-        Jellyfish()
+            Jellyfish()
     }
 }
