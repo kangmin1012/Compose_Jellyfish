@@ -7,7 +7,9 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -181,29 +183,6 @@ fun Jellyfish() {
                     fill = solidWhite300Color
                 )
             }
-            // 해파리 얼굴 Vector Group
-            Group(name = "face") {
-                Group(
-                    name = "eye",
-                    scaleY = blinkScaleAnimation.value,
-                    pivotY = 233f
-                ) {
-                    Path(
-                        pathData = JellyFishPaths.leftEye,
-                        fill = solidGrayColor,
-                        fillAlpha = blinkAlphaAnimation.value
-                    )
-                    Path(
-                        pathData = JellyFishPaths.rightEye,
-                        fill = solidGrayColor,
-                        fillAlpha = blinkAlphaAnimation.value
-                    )
-                }
-                Path(
-                    pathData = JellyFishPaths.mouth,
-                    fill = solidGray300Color
-                )
-            }
         }
 
         // 해파리 주변 거품 VectorDrawable
@@ -242,42 +221,99 @@ fun Jellyfish() {
         }
     }
 
-    Image(
-        painter = vectorPainter,
-        contentDescription = "Jellyfish",
-        modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                detectTapGestures {
-                    rememberCoroutineScope.launch {
-                        startBlinkAnimation()
+    val vectorFacePainter = rememberVectorPainter(
+        defaultWidth = 530.46f.dp,
+        defaultHeight = 563.1f.dp,
+        viewportHeight = 530.46f,
+        viewportWidth = 563.1f,
+        autoMirror = true
+    ) { _, _ ->
+        val duration = 3000 // 애니메이션 시간
+        val transition = rememberInfiniteTransition() // 무한 애니메이션 만들기
+        val translationY by transition.animateFloat(
+            initialValue = 0f,
+            targetValue = -30f,
+            animationSpec = infiniteRepeatable(
+                tween(durationMillis = duration, easing = EaseInOut),
+                repeatMode = RepeatMode.Reverse
+            )
+        )
+        // 해파리 얼굴 Vector Group
+        Group(
+            name = "face",
+            translationY = translationY
+        ) {
+            Group(
+                name = "eye",
+                scaleY = blinkScaleAnimation.value,
+                pivotY = 233f
+            ) {
+                Path(
+                    pathData = JellyFishPaths.leftEye,
+                    fill = solidGrayColor,
+                    fillAlpha = blinkAlphaAnimation.value
+                )
+                Path(
+                    pathData = JellyFishPaths.rightEye,
+                    fill = solidGrayColor,
+                    fillAlpha = blinkAlphaAnimation.value
+                )
+            }
+            Path(
+                pathData = JellyFishPaths.mouth,
+                fill = solidGray300Color
+            )
+        }
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize().background(blueRadialGradient)
+    ) {
+        Image(
+            painter = vectorPainter,
+            contentDescription = "Jellyfish",
+            modifier = Modifier
+                .fillMaxSize()
+                .onSizeChanged { size ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        shader?.setFloatUniform(
+                            "resolution",
+                            size.width.toFloat(),
+                            size.height.toFloat()
+                        )
                     }
                 }
-            }
-            .background(blueRadialGradient)
-            .onSizeChanged { size ->
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    shader?.setFloatUniform(
-                        "resolution",
-                        size.width.toFloat(),
-                        size.height.toFloat()
-                    )
-                }
-            }
-            .graphicsLayer {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    shader?.let {
-                        it.setFloatUniform("time", time)
-                        renderEffect = android.graphics.RenderEffect
-                            .createRuntimeShaderEffect(
-                                it,
-                                "contents"
-                            )
-                            .asComposeRenderEffect()
+                .graphicsLayer {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        shader?.let {
+                            it.setFloatUniform("time", time)
+                            renderEffect = android.graphics.RenderEffect
+                                .createRuntimeShaderEffect(
+                                    it,
+                                    "contents"
+                                )
+                                .asComposeRenderEffect()
+                        }
                     }
                 }
-            }
-    )
+        )
+
+        Image(
+            painter = vectorFacePainter,
+            contentDescription = "Jellyfish Face",
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTapGestures {
+                        rememberCoroutineScope.launch {
+                            startBlinkAnimation()
+                        }
+                    }
+                }
+        )
+    }
+
+
 }
 
 
@@ -285,6 +321,6 @@ fun Jellyfish() {
 @Composable
 fun PreviewJellyfish() {
     ComposeJellyfishTheme {
-            Jellyfish()
+        Jellyfish()
     }
 }
