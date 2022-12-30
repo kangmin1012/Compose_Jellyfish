@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kangmin.composejellyfish.background.blueRadialGradient
+import com.kangmin.composejellyfish.effect.PERLIN_NOISE
 import com.kangmin.composejellyfish.effect.WOBBLE_SHADER
 import com.kangmin.composejellyfish.ui.theme.ComposeJellyfishTheme
 import com.kangmin.composejellyfish.ui.theme.Gray
@@ -61,7 +62,8 @@ fun Jellyfish() {
 
     // 해당 쉐이더는 sdk 33 이상부터 가능합니다
     val shader = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        RuntimeShader(WOBBLE_SHADER)
+//        RuntimeShader(WOBBLE_SHADER)
+        RuntimeShader(PERLIN_NOISE)
     } else {
         null
     }
