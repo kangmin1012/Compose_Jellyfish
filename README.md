@@ -11,5 +11,6 @@ VectorDrawable과 Shader를 이용한 해파리 이미지 애니메이션 적용
 ## Result (API 33 이상에서만 가능)
 ### Noise 효과
 <img src="https://user-images.githubusercontent.com/55642709/210945735-8146a03b-90e4-426a-8d63-bf95bdc7d294.gif" width="30%"/>
+
 ### WOBBLE 효과
 <img src="https://user-images.githubusercontent.com/55642709/210947440-7bfbcb99-f078-4e48-839a-3cd4557a681d.gif" width="30%"/>
